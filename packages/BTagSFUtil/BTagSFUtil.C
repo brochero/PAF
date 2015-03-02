@@ -1,5 +1,5 @@
 // https://twiki.cern.ch/twiki/bin/viewauth/CMS/BTagCalibration
-#include "BTagSFUtil.h"
+#include "BTagSFUtilCSV.h"
 #include "BTagCalibrationStandalone.cc"
 #include "BTagEfficienciesTTbarSummer12.C" // Change this to Summer11Leg
 #include "FastSimCorrectionFactorsSummer12.C" // Change this to Summer11Leg
@@ -8,7 +8,7 @@ BTagSFUtil::BTagSFUtil(string BTagAlgorithm, TString OperatingPoint, int Systema
 
   rand_ = new TRandom3(Seed);
 
-  string CSVFileName = "/gpfs/csic_users/brochero/PAF_7TeV/packages/BTagSFUtil/" + BTagAlgorithm + ".csv";
+  string CSVFileName = "./" + BTagAlgorithm + ".csv";
   BTagCalibration calib(BTagAlgorithm, CSVFileName);
 
   string SystematicFlagBC = "central";
@@ -20,19 +20,26 @@ BTagSFUtil::BTagSFUtil(string BTagAlgorithm, TString OperatingPoint, int Systema
     if (SystematicIndex==+3) SystematicFlagL = "up";
   }
 
+  TaggerCut = -1;
+  TaggerName = BTagAlgorithm;
+
   if (OperatingPoint=="Loose")  {
+    if (TaggerName=="CSV") TaggerCut = 0.244;
     reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "comb", SystematicFlagBC);
     reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_LOOSE, "comb", SystematicFlagL);
   } else if (OperatingPoint=="Medium")  {
-    // combined SF: QCD + ttbar
-    //reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "comb", SystematicFlagBC);
-    // SF: only QCD
-    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "mujets", SystematicFlagBC);
+    if (TaggerName=="CSV") TaggerCut = 0.679;
+    reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "comb", SystematicFlagBC);
     reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_MEDIUM, "comb", SystematicFlagL);
-  } else if (OperatingPoint=="tight")  {
+  } else if (OperatingPoint=="Tight")  {
+    if (TaggerName=="CSV") TaggerCut = 0.898;
+    if (TaggerName=="TCHP") TaggerCut = 3.41;
     reader_bc = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, "comb", SystematicFlagBC);
     reader_l  = new BTagCalibrationReader(&calib, BTagEntry::OP_TIGHT, "comb", SystematicFlagL);
   } 
+
+  if (TaggerCut<0) 
+    cout << " " << TaggerName << " not supported for " << OperatingPoint << " WP" << endl;
 
   FastSimSystematic = 0;
   if (abs(SystematicIndex)>10) FastSimSystematic = SystematicIndex%10;
