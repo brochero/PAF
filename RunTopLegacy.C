@@ -25,7 +25,7 @@ TProof* proof = 0;
 Double_t G_Event_Weight = 1;
 
 void RunTopLegacy(int isample=0, // Temporal solution to fix the prblems with the PROOF sessions
-		  TString  sampleName     = "TTbar_Madgraph",
+		  TString  sampleName     = "TTbar_Powheg",
 		  TString  selector       = "TopLegacy",
 		  TString  fileSuffix     = "",
 		  TString  sampleSys      = "", // for systematic samples, indicate which source is going to be studied 
@@ -60,7 +60,7 @@ void RunTopLegacy(int isample=0, // Temporal solution to fix the prblems with th
   gROOT->LoadMacro("/gpfs/csic_users/brochero/DatasetManager/DatasetManager.C+");
 
   
-  if(G_Event_Lumi>10000) DatasetManager* dm = new DatasetManager("Legacy_Summer12_53X"); // 19468.3pb-1
+  if(G_Event_Lumi>10000) DatasetManager* dm = new DatasetManager("Legacy_Summer15_74X"); // 19468.3pb-1
   else                   DatasetManager* dm = new DatasetManager("Legacy_Summer11_53X"); // 5100pb-1
   
   // Use this if you know that the information on the google doc table has
